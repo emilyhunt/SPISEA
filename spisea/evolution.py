@@ -348,8 +348,13 @@ class Parsec(StellarEvolution):
         # populate list of model masses (in solar masses)
         #mass_list = [(0.1 + i*0.005) for i in range(181)]
         
-        # define metallicity parameters for Parsec models
-        self.z_list = [0.005, 0.015, 0.04]
+        # define metallicity parameters for Parsec models - 30 logspaced values (base 10) between minimum and maximum
+        # allowed PARSEC values, with np.round(np.logspace(np.log10(0.0001), np.log10(0.07), num=30), 5)
+        self.z_list = [0.0001,  0.00013, 0.00016, 0.0002,  0.00025, 0.00031, 0.00039,
+                       0.00049, 0.00061, 0.00076, 0.00096, 0.0012,  0.0015,  0.00189,
+                       0.00236, 0.00296, 0.00371, 0.00465, 0.00583, 0.00731, 0.00917,
+                       0.01149, 0.0144,  0.01805, 0.02262, 0.02836, 0.03554, 0.04455,
+                       0.05585, 0.07]
         
         # populate list of isochrone ages (log scale)
         self.age_list = np.arange(6.6, 10.12+0.005, 0.01)
@@ -360,8 +365,26 @@ class Parsec(StellarEvolution):
 
         # Specifying metallicity
         self.z_solar = 0.015
-        self.z_file_map = {0.005: 'z005/', 0.015: 'z015/', 0.04: 'z04/'}
-        
+        self.z_file_map = {x: "z" + str(int(np.round(x * 1e5))).zfill(5) + "/" for x in self.z_list}
+
+    @staticmethod
+    def metallicity_to_z(metallicity):
+        """Converts between PARSEC's [M/H] value to the initial metallicity of the
+        isochrone Z_ini, with:
+
+        Z = (x * (1 - 0.2485)) / (1 + 2.78 * x)
+        where x = Z_solar / X_solar * 10**[M/H]
+
+        X = 1 - Y - Z, Y = 0.2485 + 1.78 * Z
+
+        This also means that M/H=0 does not give solar metallicity, since PARSEC
+        isochrones are defined from the initial metallicity of the population, _not_ the
+        current one!
+
+        See: http://stev.oapd.inaf.it/cmd_3.4/faq.html
+        """
+        x = 0.0207 * 10**metallicity
+        return (x * (1 - 0.2485)) / (1 + 2.78 * x)
         
     def isochrone(self, age=1.e8, metallicity=0.0):
         r"""
@@ -369,7 +392,7 @@ class Parsec(StellarEvolution):
         collection.
         """
         # convert metallicity to mass fraction
-        z_defined = self.z_solar*10.**metallicity
+        z_defined = self.metallicity_to_z(metallicity)
 
         log_age = math.log10(age)
         
@@ -397,14 +420,14 @@ class Parsec(StellarEvolution):
         
         # return isochrone data
         iso = Table.read(full_iso_file, format='fits')
-        iso.rename_column('col1', 'Z')
-        iso.rename_column('col2', 'logAge')
-        iso.rename_column('col3', 'mass')
-        iso.rename_column('col4', 'mass_current')
-        iso.rename_column('col5', 'logL')
-        iso.rename_column('col6', 'logT')
-        iso.rename_column('col7', 'logg')
-        iso.rename_column('col15', 'phase')
+        # iso.rename_column('col1', 'Z')  # it already has the right name!
+        iso.rename_column('log(age/yr)', 'logAge')
+        iso.rename_column('M_ini', 'mass')
+        iso.rename_column('M_act', 'mass_current')
+        iso.rename_column('logL/Lo', 'logL')
+        iso.rename_column('logTe', 'logT')
+        iso.rename_column('logG', 'logg')
+        iso.rename_column('stage', 'phase')
         iso['logT_WR'] = iso['logT']
 
         # Parsec doesn't identify WR stars, so identify all as "False"

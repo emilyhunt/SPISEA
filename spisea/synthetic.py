@@ -936,23 +936,26 @@ class IsochronePhot(Isochrone):
         # For solar metallicity case, allow for legacy isochrones (which didn't have
         # metallicity tag since they were all solar metallicity) to be read
         # properly
-        if metallicity == 0.0:
-            save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_p00.fits'
-            self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5))
-
-            save_file_legacy = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}.fits'
-            self.save_file_legacy = save_file_legacy.format(iso_dir, logAge, AKs, str(distance).zfill(5))
-        else:
-            # Set metallicity flag
-            if metallicity < 0:
-                metal_pre = 'm'
-            else:
-                metal_pre = 'p'
-            metal_flag = int(abs(metallicity)*10)
-            
-            save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_{4}{5:2s}.fits'
-            self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5), metal_pre, str(metal_flag).zfill(2))
-            self.save_file_legacy = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5), metal_pre, str(metal_flag).zfill(2))
+        # Todo emily has modified the code a lot here... not sure it's good either haha
+        self.save_file = f"{iso_dir}/iso_{logAge:.2f}_{AKs:.2f}_{distance:.0f}_{metallicity:.2f}.fits"
+        self.save_file_legacy = self.save_file
+        # if metallicity == 0.0:
+        #     save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_p000.fits'
+        #     self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5))
+        #
+        #     save_file_legacy = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}.fits'
+        #     self.save_file_legacy = save_file_legacy.format(iso_dir, logAge, AKs, str(distance).zfill(5))
+        # else:
+        #     # Set metallicity flag
+        #     if metallicity < 0:
+        #         metal_pre = 'm'
+        #     else:
+        #         metal_pre = 'p'
+        #     metal_flag = int(np.round(abs(metallicity)*100))
+        #
+        #     save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_{4}{5:2s}.fits'
+        #     self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5), metal_pre, str(metal_flag).zfill(3))
+        #     self.save_file_legacy = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5), metal_pre, str(metal_flag).zfill(3))
             
         # Expected filters
         self.filters = filters
@@ -1535,8 +1538,11 @@ def get_obs_str(col):
                  'ukirt_J':'ukirt,J', 'ukirt_H':'ukirt,H', 'ukirt_K':'ukirt,K',
                  'ctio_osiris_H': 'ctio_osiris,H', 'ctio_osiris_K': 'ctio_osiris,K',
                  'ztf_g':'ztf,g', 'ztf_r':'ztf,r', 'ztf_i':'ztf,i',
-                 'gaiaDR2_G': 'gaia,dr2_rev,G', 'gaiaDR2_Gbp':'gaia,dr2_rev,Gbp',
-                 'gaiaDR2_Grp':'gaia,dr2_rev,Grp'}
+                 'gaiaDR2_G': 'gaia,dr2_rev,G', 'gaiaDR2_Gbp': 'gaia,dr2_rev,Gbp',
+                 'gaiaDR2_Grp': 'gaia,dr2_rev,Grp',
+                 'gaiaEDR3_G': 'gaia,edr3,G', 'gaiaEDR3_Gbp': 'gaia,edr3,Gbp',
+                 'gaiaEDR3_Grp': 'gaia,edr3,Grp'
+                 }
 
     obs_str = filt_list[name]
         
