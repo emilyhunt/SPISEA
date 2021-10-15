@@ -127,7 +127,7 @@ class ResolvedCluster(Cluster):
         True for verbose output.
     """
     def __init__(self, iso, imf, cluster_mass, ifmr=None, verbose=True,
-                     seed=None):
+                     seed=None, remove_bad_masses=True):
         Cluster.__init__(self, iso, imf, cluster_mass, ifmr=ifmr, verbose=verbose,
                              seed=seed)
 
@@ -162,7 +162,8 @@ class ResolvedCluster(Cluster):
         
         # Trim out bad systems; specifically, stars with masses outside those provided
         # by the model isochrone (except for compact objects).
-        star_systems, compMass = self._remove_bad_systems(star_systems, compMass)
+        if remove_bad_masses:
+            star_systems, compMass = self._remove_bad_systems(star_systems, compMass)
 
         ##### 
         # Make a table to contain all the information about companions.
@@ -480,10 +481,10 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         True for verbose output.
     """
     def __init__(self, iso, imf, cluster_mass, deltaAKs,
-                 ifmr=None, verbose=False, seed=None):
+                 ifmr=None, verbose=False, seed=None, remove_bad_masses=True):
 
         ResolvedCluster.__init__(self, iso, imf, cluster_mass, ifmr=ifmr, verbose=verbose,
-                                     seed=seed)
+                                     seed=seed, remove_bad_masses=remove_bad_masses)
 
         # Set random seed, if desired
         if seed is not None:
