@@ -300,6 +300,10 @@ class ResolvedCluster(Cluster):
         for filt in self.filt_names:
             companions.add_column( Column(np.empty(N_comp_tot, dtype=float), name=filt) )
 
+            # Ensure we have a record of how bright primaries are, because it's about to get overwritten
+            col_name = f"{filt}_primary"
+            star_systems[col_name] = star_systems[filt]
+
         # Make an array that maps system index (ii), companion index (cc) to
         # the place in the 1D companions array.
         N_comp_max = N_companions.max()
@@ -310,6 +314,7 @@ class ResolvedCluster(Cluster):
             for cc in range(N_companions[ii]):
                 comp_index[ii][cc] = kk
                 kk += 1
+
 
         # Find all the systems with at least one companion... add the flux
         # of that companion to the primary. Repeat for 2 companions,
