@@ -249,7 +249,7 @@ class ResolvedCluster(Cluster):
         # Remnants have flux = 0 in all bands if they are generated here.
         ##### 
         if self.ifmr != None:
-            # Identify compact objects as those with Teff = 0 or with phase > 100.
+            # Identify compact objects as those with NaN Teff values and a mass above the highest allowed mass
             highest_mass_iso = self.iso.points['mass'].max()
             idx_rem = np.where((np.isnan(star_systems['Teff'])) & (star_systems['mass'] > highest_mass_iso))[0]
             
@@ -379,10 +379,9 @@ class ResolvedCluster(Cluster):
         # Make Remnants with flux = 0 in all bands.
         ##### 
         if self.ifmr != None:
-            # Identify compact objects as those with Teff = 0 or with masses above the max iso mass
+            # Identify compact objects as those with NaN Teff values and a mass above the highest allowed mass
             highest_mass_iso = self.iso.points['mass'].max()
-            cdx_rem = np.where((companions['Teff'] == 0) &
-                                (companions['mass'] > highest_mass_iso))[0]
+            cdx_rem = np.where((np.isnan(companions['Teff'])) & (companions['mass'] > highest_mass_iso))[0]
             
             # Calculate remnant mass and ID for compact objects; update remnant_id and
             # remnant_mass arrays accordingly
