@@ -169,6 +169,7 @@ class ResolvedCluster(Cluster):
         # Make a table to contain all the information about companions.
         #####
         if self.imf.make_multiples:
+            star_systems["L_primary"] = star_systems["L"]
             companions = self._make_companions_table(star_systems, compMass)
             
         #####
