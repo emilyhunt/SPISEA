@@ -26,6 +26,7 @@ import time
 import warnings
 import pdb
 from scipy.spatial import cKDTree as KDTree
+from scipy.stats import norm
 
 default_evo_model = evolution.MISTv1()
 default_red_law = reddening.RedLawNishiyama09()
@@ -486,7 +487,7 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         True for verbose output.
     """
     def __init__(self, iso, imf, cluster_mass, deltaAKs,
-                 ifmr=None, verbose=False, seed=None, remove_bad_masses=True):
+                 ifmr=None, verbose=False, seed=None, remove_bad_masses=True, deltaAKs_model=norm):
 
         ResolvedCluster.__init__(self, iso, imf, cluster_mass, ifmr=ifmr, verbose=verbose,
                                      seed=seed, remove_bad_masses=remove_bad_masses)
@@ -518,7 +519,7 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         # Perturb all of star systems' photometry by a random amount corresponding to
         # differential de-reddening. The distribution is normal with a width of
         # Aks +/- deltaAKs in each filter
-        rand_red = np.random.randn(len(self.star_systems))
+        rand_red = deltaAKs_model.rvs(len(self.star_systems))
 
         for filt in self.filt_names:
             self.star_systems[filt] += rand_red * delta_red_filt[filt]
