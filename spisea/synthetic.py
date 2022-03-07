@@ -519,7 +519,7 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         # Perturb all of star systems' photometry by a random amount corresponding to
         # differential de-reddening. The distribution is normal with a width of
         # Aks +/- deltaAKs in each filter
-        rand_red = deltaAKs_model.rvs(len(self.star_systems))
+        rand_red = deltaAKs_model.rvs(size=len(self.star_systems))
 
         for filt in self.filt_names:
             self.star_systems[filt] += rand_red * delta_red_filt[filt]
