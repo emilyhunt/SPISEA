@@ -522,7 +522,10 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         rand_red = deltaAKs_model.rvs(size=len(self.star_systems))
 
         for filt in self.filt_names:
-            self.star_systems[filt] += rand_red * delta_red_filt[filt]
+            photometry_delta = rand_red * delta_red_filt[filt]
+
+            self.star_systems.add_column(Column(photometry_delta, name="delta_" + filt))
+            self.star_systems[filt] += photometry_delta
 
         # Perturb the companions by the same amount.
         if self.imf.make_multiples:
