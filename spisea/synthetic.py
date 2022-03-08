@@ -487,7 +487,8 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         True for verbose output.
     """
     def __init__(self, iso, imf, cluster_mass, deltaAKs,
-                 ifmr=None, verbose=False, seed=None, remove_bad_masses=True, deltaAKs_model=norm):
+                 ifmr=None, verbose=False, seed=None, remove_bad_masses=True, deltaAKs_model=norm,
+                 clip_negative_deltaAKs=False):
 
         ResolvedCluster.__init__(self, iso, imf, cluster_mass, ifmr=ifmr, verbose=verbose,
                                      seed=seed, remove_bad_masses=remove_bad_masses)
@@ -520,6 +521,11 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         # differential de-reddening. The distribution is normal with a width of
         # Aks +/- deltaAKs in each filter
         rand_red = deltaAKs_model.rvs(size=len(self.star_systems))
+
+        # Have the option to clip the amount of differential reddening, ensuring that no star ever has a "negative"
+        # reddening
+        if clip_negative_deltaAKs:
+            rand_red = np.where(AKs - rand_red > 0, rand_red, 0.0)
 
         for filt in self.filt_names:
             photometry_delta = rand_red * delta_red_filt[filt]
