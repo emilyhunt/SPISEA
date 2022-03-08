@@ -525,7 +525,7 @@ class ResolvedClusterDiffRedden(ResolvedCluster):
         # Have the option to clip the amount of differential reddening, ensuring that no star ever has a "negative"
         # reddening
         if clip_negative_deltaAKs:
-            rand_red = np.where(AKs - rand_red > 0, rand_red, 0.0)
+            rand_red = np.where(AKs + rand_red > 0, rand_red, 0.0)
 
         for filt in self.filt_names:
             photometry_delta = rand_red * delta_red_filt[filt]
