@@ -954,7 +954,6 @@ class IsochronePhot(Isochrone):
         # properly
         # Todo emily has modified the code a lot here... not sure it's good either haha
         self.save_file = f"{iso_dir}/iso_{logAge:.2f}_{AKs:.2f}_{distance:.0f}_{metallicity:.2f}.fits"
-        self.save_file_legacy = self.save_file
         # if metallicity == 0.0:
         #     save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_p000.fits'
         #     self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5))
@@ -994,10 +993,7 @@ class IsochronePhot(Isochrone):
             self.make_photometry(rebin=rebin, vega=vega)
         else:
             self.recalc = False
-            try:
-                self.points = Table.read(self.save_file)
-            except:
-                self.points = Table.read(self.save_file_legacy)
+            self.points = Table.read(self.save_file)
             # Add some error checking.
 
         return
@@ -1063,23 +1059,20 @@ class IsochronePhot(Isochrone):
         meta-data as well.
 
         returns a boolean: True is file exists, false otherwise
-        """
-        out_bool = False
-        
-        if os.path.exists(self.save_file) | os.path.exists(self.save_file_legacy):
+        """        
+        if os.path.exists(self.save_file):
             try:
                 tmp = Table.read(self.save_file)
             except:
-                tmp = Table.read(self.save_file_legacy)
-            
+                return False
         
             # See if the meta-data matches: evo model, atm_func, redlaw
             if ( (tmp.meta['EVOMODEL'] == type(evo_model).__name__) &
                 (tmp.meta['ATMFUNC'] == atm_func.__name__) &
                  (tmp.meta['REDLAW'] == red_law.name) ):
-                out_bool = True
+                return True
             
-        return out_bool
+        return False
 
     def plot_CMD(self, mag1, mag2, savefile=None):
         """
