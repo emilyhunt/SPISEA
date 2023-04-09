@@ -942,35 +942,18 @@ class IsochronePhot(Isochrone):
                  red_law=default_red_law, mass_sampling=1, iso_dir='./',
                  min_mass=None, max_mass=None, rebin=True, recomp=False,
                  filters=['ubv,U', 'ubv,B', 'ubv,V',
-                          'ubv,R', 'ubv,I']):
+                          'ubv,R', 'ubv,I'],
+                 extinction_decimal_places=2):
 
         # Make the iso_dir, if it doesn't already exist
         if not os.path.exists(iso_dir):
             os.mkdir(iso_dir)
 
         # Make and input/output file name for the stored isochrone photometry.
-        # For solar metallicity case, allow for legacy isochrones (which didn't have
-        # metallicity tag since they were all solar metallicity) to be read
-        # properly
         # Todo emily has modified the code a lot here... not sure it's good either haha
-        self.save_file = f"{iso_dir}/iso_{logAge:.2f}_{AKs:.2f}_{distance:.0f}_{metallicity:.2f}.fits"
-        # if metallicity == 0.0:
-        #     save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_p000.fits'
-        #     self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5))
-        #
-        #     save_file_legacy = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}.fits'
-        #     self.save_file_legacy = save_file_legacy.format(iso_dir, logAge, AKs, str(distance).zfill(5))
-        # else:
-        #     # Set metallicity flag
-        #     if metallicity < 0:
-        #         metal_pre = 'm'
-        #     else:
-        #         metal_pre = 'p'
-        #     metal_flag = int(np.round(abs(metallicity)*100))
-        #
-        #     save_file_fmt = '{0}/iso_{1:.2f}_{2:4.2f}_{3:4s}_{4}{5:2s}.fits'
-        #     self.save_file = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5), metal_pre, str(metal_flag).zfill(3))
-        #     self.save_file_legacy = save_file_fmt.format(iso_dir, logAge, AKs, str(distance).zfill(5), metal_pre, str(metal_flag).zfill(3))
+        self.save_file = (
+            f"{iso_dir}/iso_{logAge:.2f}_{AKs:.{extinction_decimal_places}f}_{distance:.0f}_{metallicity:.2f}.fits"
+        )
             
         # Expected filters
         self.filters = filters
